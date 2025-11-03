@@ -6,28 +6,22 @@ console.log('🔌 Content script cargado en:', window.location.href);
 function detectarSitio() {
   const hostname = window.location.hostname.toLowerCase();
   
-  if (hostname.includes('chatgpt.com') || hostname.includes('openai.com')) {
+  if (hostname.includes('chatgpt.com')) {
     return 'chatgpt';
   } else if (hostname.includes('gemini.google.com')) {
     return 'gemini';
-  } else if (hostname.includes('google.com') && !hostname.includes('mail.google.com')) {
-    return 'google';
-  } else if (hostname.includes('facebook.com') || hostname.includes('meta.ai')) {
+  } else if (hostname.includes('meta.ai')) {
     return 'meta';
-  } else if (hostname.includes('wikipedia.org')) {
-    return 'wikipedia';
-  } else if (hostname.includes('claude.ai') || hostname.includes('anthropic.com')) {
+  } else if (hostname.includes('claude.ai')) {
     return 'claude';
-  } else if (hostname.includes('copilot.microsoft.com') || hostname.includes('github.com/features/copilot')) {
+  } else if (hostname.includes('copilot.microsoft.com')) {
     return 'copilot';
   } else if (hostname.includes('deepseek.com') || hostname.includes('chat.deepseek.com')) {
     return 'deepseek';
-  } else if (hostname.includes('grok.com') || hostname.includes('x.ai')) {
+  } else if (hostname.includes('grok.com')) {
     return 'grok';
   } else if (hostname.includes('mistral.ai') || hostname.includes('chat.mistral.ai')) {
     return 'mistral';
-  } else if (hostname.includes('mail.google.com') || hostname.includes('gmail.com')) {
-    return 'gmail';
   } else if (hostname.includes('perplexity.ai')) {
     return 'perplexity';
   } else {
@@ -300,6 +294,62 @@ function enviarTextoUniversal(texto) {
               elemento.focus(); // Volver a enfocar
               
               console.log('✅ Texto insertado correctamente');
+              
+              // Presionar ENTER automáticamente después de insertar el texto
+              // Esperar más tiempo para asegurar que el texto se haya insertado correctamente
+              setTimeout(() => {
+                console.log('⏎ Presionando ENTER...');
+                
+                // Simular presionar Enter
+                const enterEvent = new KeyboardEvent('keydown', {
+                  key: 'Enter',
+                  code: 'Enter',
+                  keyCode: 13,
+                  which: 13,
+                  bubbles: true,
+                  cancelable: true
+                });
+                elemento.dispatchEvent(enterEvent);
+                
+                // También disparar keyup y keypress para asegurar
+                const enterUpEvent = new KeyboardEvent('keyup', {
+                  key: 'Enter',
+                  code: 'Enter',
+                  keyCode: 13,
+                  which: 13,
+                  bubbles: true,
+                  cancelable: true
+                });
+                elemento.dispatchEvent(enterUpEvent);
+                
+                // Buscar y hacer clic en el botón de envío si existe
+                const botonesEnvio = [
+                  'button[type="submit"]',
+                  'button[data-testid*="send"]',
+                  'button[aria-label*="Send"]',
+                  'button[aria-label*="Enviar"]',
+                  'button[title*="Send"]',
+                  'button[title*="Enviar"]',
+                  'button svg[data-icon="send"]',
+                  'button:has(svg[data-icon="send"])',
+                  '[data-testid="send-button"]'
+                ];
+                
+                for (const selector of botonesEnvio) {
+                  try {
+                    const boton = document.querySelector(selector);
+                    if (boton && !boton.disabled && boton.offsetParent !== null) {
+                      console.log('🔘 Botón de envío encontrado, haciendo clic...');
+                      boton.click();
+                      break;
+                    }
+                  } catch (e) {
+                    // Continuar con el siguiente selector
+                  }
+                }
+                
+                console.log('✅ ENTER presionado');
+              }, 1500); // Aumentado de 500ms a 1500ms
             }, 100);
             
             return true;

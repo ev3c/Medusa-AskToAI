@@ -16,6 +16,47 @@ body {
     gap: 15px;
 }
 
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    margin-bottom: 5px;
+}
+
+.popup-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #4CAF50;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    flex: 1;
+}
+
+.header-icons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.header-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.header-icon:hover {
+    transform: scale(1.1);
+}
+
 .main-label {
     font-size: 16px;
     font-weight: bold;
