@@ -23,6 +23,18 @@
     "tabs",
     "contextMenus"
   ],
+    "https://chat.openai.com/*",
+    "https://chatgpt.com/*",
+    "https://claude.ai/*",
+    "https://chat.deepseek.com/*",
+    "https://copilot.microsoft.com/*",
+    "https://gemini.google.com/*",
+    "https://x.ai/*",
+    "https://meta.ai/*",
+    "https://chat.mistral.ai/*",
+    "https://www.google.com/*",
+    "https://www.perplexity.ai/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },

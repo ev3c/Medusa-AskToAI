@@ -5,7 +5,7 @@ const AI_URLS = {
     deepseek: 'https://chat.deepseek.com',
     copilot: 'https://copilot.microsoft.com',
     gemini: 'https://gemini.google.com',
-    grok: 'https://x.ai/grok',
+    grok: 'https://x.ai', // Corregido: La ruta no debe estar en la URL base
     meta: 'https://meta.ai',
     mistral: 'https://chat.mistral.ai',
     google: 'https://www.google.com',
@@ -142,8 +142,6 @@ async function sendToAllAIs(prompt) {
     for (const aiService of aiServices) {
         console.log(`--- Procesando ${aiService} ---`);
         await sendPromptToAI(aiService, prompt);
-        // Opcional: añadir una pequeña pausa entre cada IA si es necesario
-        // await new Promise(resolve => setTimeout(resolve, 500));
     }
     console.log('--- Envío a todas las IAs completado ---');
 }
@@ -155,14 +153,14 @@ async function sendToAllAIs(prompt) {
  */
 async function sendPromptToAI(aiService, prompt) {
     try {
-        const tab = await findOrCreateTab(aiService);
-        console.log(`Pestaña para ${aiService} gestionada:`, tab);
+        const { tab, isNew } = await findOrCreateTab(aiService);
+        console.log(`Pestaña para ${aiService} gestionada (es nueva: ${isNew}):`, tab);
 
         // Esperar a que la pestaña esté completamente cargada antes de continuar.
         await waitForTabLoad(tab);
 
         // Inyectar el script de contenido y enviarle el mensaje con el prompt.
-        await injectAndSendMessage(tab.id, prompt);
+        await injectAndSendMessage(tab.id, prompt, isNew);
 
     } catch (error) {
         console.error(`Error procesando la petición para ${aiService}:`, error);
@@ -171,26 +169,39 @@ async function sendPromptToAI(aiService, prompt) {
 
 /**
  * Busca una pestaña existente para el servicio de IA o crea una nueva.
- * @param {string} aiService - El nombre del servicio (ej. 'chatgpt').
- * @returns {Promise<chrome.tabs.Tab>} La pestaña encontrada o creada.
+ * @param {string} aiService - El nombre del servicio.
+ * @returns {Promise<{tab: chrome.tabs.Tab, isNew: boolean}>} Un objeto con la pestaña y un booleano que indica si es nueva.
  */
 async function findOrCreateTab(aiService) {
     const url = AI_URLS[aiService];
     if (!url) throw new Error(`URL no encontrada para el servicio: ${aiService}`);
 
-    const urlPattern = `${url}/*`;
-    const tabs = await chrome.tabs.query({ url: urlPattern });
+    let urlPatterns = [`${url}/*`];
+    if (aiService === 'chatgpt') {
+        urlPatterns.push('https://chatgpt.com/*');
+    }
+    
+    console.log(`[Medusa-AskToAI] Buscando pestaña con patrones:`, urlPatterns);
 
-    if (tabs.length > 0) {
-        console.log(`Pestaña existente encontrada para ${aiService}:`, tabs[0]);
-        // Activar la pestaña y poner el foco en su ventana.
-        await chrome.tabs.update(tabs[0].id, { active: true });
-        await chrome.windows.update(tabs[0].windowId, { focused: true });
-        return tabs[0];
-    } else {
-        console.log(`No se encontró pestaña para ${aiService}, creando una nueva.`);
+    try {
+        const tabs = await chrome.tabs.query({ url: urlPatterns });
+        console.log(`[Medusa-AskToAI] Pestañas encontradas:`, tabs);
+
+        if (tabs.length > 0) {
+            const targetTab = tabs[0];
+            console.log(`[Medusa-AskToAI] Pestaña EXISTENTE encontrada para ${aiService}`);
+            await chrome.tabs.update(targetTab.id, { active: true });
+            return { tab: targetTab, isNew: false };
+        } else {
+            console.log(`[Medusa-AskToAI] No se encontró pestaña para ${aiService}. Creando una NUEVA.`);
+            const newTab = await chrome.tabs.create({ url: url, active: true });
+            return { tab: newTab, isNew: true };
+        }
+    } catch (error) {
+        console.error(`[Medusa-AskToAI] Error en findOrCreateTab para "${aiService}":`, error);
+        console.log(`[Medusa-AskToAI] Fallback: Creando una NUEVA pestaña debido a error.`);
         const newTab = await chrome.tabs.create({ url: url, active: true });
-        return newTab;
+        return { tab: newTab, isNew: true };
     }
 }
 
@@ -220,11 +231,13 @@ async function waitForTabLoad(tab) {
  * Inyecta el content script si es necesario y envía el mensaje con el prompt.
  * @param {number} tabId - El ID de la pestaña de destino.
  * @param {string} prompt - El texto a enviar.
+ * @param {boolean} isNew - True si la pestaña es nueva.
  */
-async function injectAndSendMessage(tabId, prompt) {
-    // Un tiempo de espera generoso para que los scripts de la página (React, etc.) se inicialicen
-    const waitTime = 4000;
-    console.log(`Esperando ${waitTime}ms para que la página se inicialice...`);
+async function injectAndSendMessage(tabId, prompt, isNew) {
+    // Si la pestaña es nueva, necesita más tiempo para cargar todos los scripts (React, etc.)
+    // Si ya existía, es probable que esté lista, por lo que la espera es mucho menor.
+    const waitTime = isNew ? 5000 : 500; // 5s para pestañas nuevas, 0.5s para existentes
+    console.log(`La pestaña es ${isNew ? 'NUEVA' : 'EXISTENTE'}. Esperando ${waitTime}ms...`);
     await new Promise(resolve => setTimeout(resolve, waitTime));
 
     try {
@@ -232,9 +245,8 @@ async function injectAndSendMessage(tabId, prompt) {
         await chrome.tabs.sendMessage(tabId, { action: 'insertarTexto', texto: prompt });
         console.log(`Prompt enviado a la pestaña ${tabId} exitosamente.`);
     } catch (error) {
-        console.warn(`Fallo al enviar el mensaje a la pestaña ${tabId}. Puede que el content script no esté inyectado.`, error.message);
-        console.log(`Inyectando 'content.js' en la pestaña ${tabId} y reintentando...`);
-
+        console.warn(`Fallo al enviar mensaje a la pestaña ${tabId}. Inyectando script y reintentando...`, error.message);
+        
         // Si falla, es probable que el script no esté inyectado (ej. en una pestaña recién creada).
         await chrome.scripting.executeScript({
             target: { tabId: tabId },
