@@ -1,3 +1,17 @@
+// URLs de los servicios de IA
+const AI_URLS = {
+    chatgpt: 'https://chat.openai.com',
+    claude: 'https://claude.ai',
+    deepseek: 'https://chat.deepseek.com',
+    copilot: 'https://copilot.microsoft.com',
+    gemini: 'https://gemini.google.com',
+    grok: 'https://x.ai/grok',
+    meta: 'https://meta.ai',
+    mistral: 'https://chat.mistral.ai',
+    google: 'https://www.google.com',
+    perplexity: 'https://www.perplexity.ai'
+};
+
 // Script de fondo que maneja la extensión
 
 // Función para actualizar el menú contextual con la URL actual
@@ -44,7 +58,7 @@ chrome.runtime.onInstalled.addListener(() => {
 // Actualizar el menú contextual cuando cambia la pestaña activa
 chrome.tabs.onActivated.addListener((activeInfo) => {
   chrome.tabs.get(activeInfo.tabId, (tab) => {
-    if (tab.url) {
+    if (tab && tab.url) {
       updateContextMenu(tab.url);
     }
   });
@@ -94,4 +108,144 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       chrome.action.openPopup();
     });
   }
-}); 
+});
+
+
+// =================================================================================
+// NUEVA LÓGICA DE ORQUESTACIÓN
+// =================================================================================
+
+// Listener para mensajes desde el popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'sendToAI') {
+        if (request.aiService === 'allAI') {
+            console.log('Recibida petición para enviar a All AI.');
+            sendToAllAIs(request.prompt);
+        } else {
+            console.log(`Recibida petición para enviar a ${request.aiService}`);
+            sendPromptToAI(request.aiService, request.prompt);
+        }
+        // Devolver true indica que la respuesta se enviará de forma asíncrona.
+        return true;
+    }
+});
+
+/**
+ * Envía un prompt a todos los servicios de IA de forma secuencial.
+ * @param {string} prompt - El texto a enviar.
+ */
+async function sendToAllAIs(prompt) {
+    console.log('Iniciando envío de prompt a todas las IAs...');
+    // Se excluye 'google' ya que no es una IA conversacional del mismo tipo.
+    const aiServices = Object.keys(AI_URLS).filter(key => key !== 'google');
+    
+    for (const aiService of aiServices) {
+        console.log(`--- Procesando ${aiService} ---`);
+        await sendPromptToAI(aiService, prompt);
+        // Opcional: añadir una pequeña pausa entre cada IA si es necesario
+        // await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    console.log('--- Envío a todas las IAs completado ---');
+}
+
+/**
+ * Orquestador principal: busca o crea una pestaña y le envía el prompt.
+ * @param {string} aiService - El nombre del servicio (ej. 'chatgpt').
+ * @param {string} prompt - El texto a enviar.
+ */
+async function sendPromptToAI(aiService, prompt) {
+    try {
+        const tab = await findOrCreateTab(aiService);
+        console.log(`Pestaña para ${aiService} gestionada:`, tab);
+
+        // Esperar a que la pestaña esté completamente cargada antes de continuar.
+        await waitForTabLoad(tab);
+
+        // Inyectar el script de contenido y enviarle el mensaje con el prompt.
+        await injectAndSendMessage(tab.id, prompt);
+
+    } catch (error) {
+        console.error(`Error procesando la petición para ${aiService}:`, error);
+    }
+}
+
+/**
+ * Busca una pestaña existente para el servicio de IA o crea una nueva.
+ * @param {string} aiService - El nombre del servicio (ej. 'chatgpt').
+ * @returns {Promise<chrome.tabs.Tab>} La pestaña encontrada o creada.
+ */
+async function findOrCreateTab(aiService) {
+    const url = AI_URLS[aiService];
+    if (!url) throw new Error(`URL no encontrada para el servicio: ${aiService}`);
+
+    const urlPattern = `${url}/*`;
+    const tabs = await chrome.tabs.query({ url: urlPattern });
+
+    if (tabs.length > 0) {
+        console.log(`Pestaña existente encontrada para ${aiService}:`, tabs[0]);
+        // Activar la pestaña y poner el foco en su ventana.
+        await chrome.tabs.update(tabs[0].id, { active: true });
+        await chrome.windows.update(tabs[0].windowId, { focused: true });
+        return tabs[0];
+    } else {
+        console.log(`No se encontró pestaña para ${aiService}, creando una nueva.`);
+        const newTab = await chrome.tabs.create({ url: url, active: true });
+        return newTab;
+    }
+}
+
+/**
+ * Espera a que una pestaña termine de cargar.
+ * @param {chrome.tabs.Tab} tab - La pestaña a observar.
+ */
+async function waitForTabLoad(tab) {
+    // Si la pestaña ya está cargada, no hay nada que hacer.
+    if (tab.status === 'complete') {
+        return;
+    }
+
+    return new Promise(resolve => {
+        const listener = (tabId, changeInfo, updatedTab) => {
+            // Escuchar hasta que la pestaña correcta esté 'complete'.
+            if (tabId === tab.id && changeInfo.status === 'complete') {
+                chrome.tabs.onUpdated.removeListener(listener);
+                resolve();
+            }
+        };
+        chrome.tabs.onUpdated.addListener(listener);
+    });
+}
+
+/**
+ * Inyecta el content script si es necesario y envía el mensaje con el prompt.
+ * @param {number} tabId - El ID de la pestaña de destino.
+ * @param {string} prompt - El texto a enviar.
+ */
+async function injectAndSendMessage(tabId, prompt) {
+    // Un tiempo de espera generoso para que los scripts de la página (React, etc.) se inicialicen
+    const waitTime = 4000;
+    console.log(`Esperando ${waitTime}ms para que la página se inicialice...`);
+    await new Promise(resolve => setTimeout(resolve, waitTime));
+
+    try {
+        // Primer intento: enviar el mensaje directamente.
+        await chrome.tabs.sendMessage(tabId, { action: 'insertarTexto', texto: prompt });
+        console.log(`Prompt enviado a la pestaña ${tabId} exitosamente.`);
+    } catch (error) {
+        console.warn(`Fallo al enviar el mensaje a la pestaña ${tabId}. Puede que el content script no esté inyectado.`, error.message);
+        console.log(`Inyectando 'content.js' en la pestaña ${tabId} y reintentando...`);
+
+        // Si falla, es probable que el script no esté inyectado (ej. en una pestaña recién creada).
+        await chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            files: ['content.js'],
+        });
+        
+        // Esperar un momento para asegurar que el script se cargue antes de reintentar.
+        await new Promise(resolve => setTimeout(resolve, 500)); 
+
+        // Segundo intento: enviar el mensaje de nuevo.
+        await chrome.tabs.sendMessage(tabId, { action: 'insertarTexto', texto: prompt });
+        console.log(`Prompt enviado a la pestaña ${tabId} exitosamente en el segundo intento.`);
+    }
+}

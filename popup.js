@@ -1,48 +1,3 @@
-// URLs de los servicios de IA
-const AI_URLS = {
-    chatgpt: 'https://chat.openai.com',
-    claude: 'https://claude.ai',
-    deepseek: 'https://chat.deepseek.com',
-    copilot: 'https://copilot.microsoft.com',
-    gemini: 'https://gemini.google.com',
-    grok: 'https://x.ai/grok',
-    meta: 'https://meta.ai',
-    mistral: 'https://chat.mistral.ai',
-    google: 'https://www.google.com',
-    perplexity: 'https://www.perplexity.ai'
-};
-
-// Verificar si la URL actual coincide con el servicio seleccionado
-function isCorrectAIWebsite(currentUrl, selectedAI) {
-    if (selectedAI === 'google') return true;
-    const aiUrl = AI_URLS[selectedAI];
-    if (!aiUrl) return false;
-    const aiDomain = new URL(aiUrl).hostname.replace('www.', '');
-    const currentDomain = new URL(currentUrl).hostname.replace('www.', '');
-    return currentDomain.includes(aiDomain.split('.')[0]) || aiDomain.includes(currentDomain.split('.')[0]);
-}
-
-// Abrir nueva pestaña con el servicio de IA correcto
-async function openCorrectAITab(selectedAI) {
-    const url = AI_URLS[selectedAI];
-    if (!url) throw new Error(`No hay URL definida para ${selectedAI}`);
-    
-    const newTab = await chrome.tabs.create({ url: url, active: true });
-    
-    return new Promise((resolve) => {
-        const checkTabLoaded = () => {
-            chrome.tabs.get(newTab.id, (tab) => {
-                if (tab.status === 'complete') {
-                    resolve(tab);
-                } else {
-                    setTimeout(checkTabLoaded, 500);
-                }
-            });
-        };
-        checkTabLoaded();
-    });
-}
-
 // Cargar preferencia guardada
 async function loadUserPreference() {
     try {
@@ -51,7 +6,7 @@ async function loadUserPreference() {
         const radioButton = document.querySelector(`input[name="aiService"][value="${value}"]`);
         if (radioButton) radioButton.checked = true;
     } catch (error) {
-        // Error silencioso - usará chatgpt por defecto
+        console.error('Error cargando preferencia:', error);
     }
 }
 
@@ -60,28 +15,19 @@ async function saveUserPreference(selectedAI) {
     try {
         await chrome.storage.sync.set({ selectedAI: selectedAI });
     } catch (error) {
-        // Error silencioso - no crítico
+        console.error('Error guardando preferencia:', error);
     }
 }
 
 // Guardar prompt usado
 async function savePromptUsage(prompt) {
     try {
-        // Obtener el historial actual
         const result = await chrome.storage.local.get(['promptHistory']);
         let promptHistory = result.promptHistory || {};
         
-        // Actualizar contador del prompt
-        if (promptHistory[prompt]) {
-            promptHistory[prompt]++;
-        } else {
-            promptHistory[prompt] = 1;
-        }
+        promptHistory[prompt] = (promptHistory[prompt] || 0) + 1;
         
-        // Guardar de vuelta
         await chrome.storage.local.set({ promptHistory: promptHistory });
-        
-        // Actualizar la visualización
         await displayFrequentPrompts();
     } catch (error) {
         console.error('Error guardando prompt:', error);
@@ -94,13 +40,10 @@ async function getTopPrompts() {
         const result = await chrome.storage.local.get(['promptHistory']);
         const promptHistory = result.promptHistory || {};
         
-        // Convertir a array y ordenar por uso
-        const promptArray = Object.entries(promptHistory)
+        return Object.entries(promptHistory)
             .map(([prompt, count]) => ({ prompt, count }))
             .sort((a, b) => b.count - a.count)
             .slice(0, 5);
-        
-        return promptArray;
     } catch (error) {
         console.error('Error obteniendo prompts frecuentes:', error);
         return [];
@@ -113,21 +56,18 @@ async function displayFrequentPrompts() {
     const container = document.getElementById('frequentPromptsContainer');
     const list = document.getElementById('frequentPromptsList');
     
-    // Si no hay prompts, ocultar el contenedor
     if (topPrompts.length === 0) {
         container.classList.add('hidden');
         return;
     }
     
-    // Mostrar el contenedor y limpiar la lista
     container.classList.remove('hidden');
     list.innerHTML = '';
     
-    // Crear elementos para cada prompt
     topPrompts.forEach(item => {
         const promptElement = document.createElement('div');
         promptElement.className = 'frequent-prompt-item';
-        promptElement.title = item.prompt; // Mostrar completo en tooltip
+        promptElement.title = item.prompt;
         
         const promptText = document.createElement('span');
         promptText.className = 'prompt-text';
@@ -140,10 +80,10 @@ async function displayFrequentPrompts() {
         promptElement.appendChild(promptText);
         promptElement.appendChild(promptCount);
         
-        // Añadir evento de clic para rellenar el campo
         promptElement.addEventListener('click', () => {
-            document.getElementById('askInput').value = item.prompt;
-            document.getElementById('askInput').focus();
+            const askInput = document.getElementById('askInput');
+            askInput.value = item.prompt;
+            askInput.focus();
         });
         
         list.appendChild(promptElement);
@@ -156,326 +96,119 @@ function getSelectedAI() {
     return selectedRadio ? selectedRadio.value : null;
 }
 
-// Enviar texto
-async function textToAI(textPrompt, targetTab = null) {
-    const tab = targetTab || (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
-    
-    if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')) {
-        throw new Error('No se puede ejecutar en esta página');
-    }
-
-    console.log('🔄 Preparando pestaña:', tab.url);
-    
-    // Si es una pestaña nueva (targetTab != null), no recargar
-    // Si es la pestaña actual (targetTab == null), recargar
-    if (!targetTab) {
-        console.log('📄 Pestaña existente detectada, recargando...');
-        // 1. Pasar el foco a la pestaña
-        await chrome.tabs.update(tab.id, { active: true });
-        console.log('👁️ Foco pasado a la pestaña');
-        
-        // 2. Actualizar/refrescar la pestaña existente
-        await chrome.tabs.reload(tab.id);
-        console.log('🔄 Pestaña actualizada');
-    } else {
-        console.log('🆕 Pestaña nueva detectada, esperando carga inicial...');
-        // Solo pasar el foco, NO recargar
-        await chrome.tabs.update(tab.id, { active: true });
-        console.log('👁️ Foco pasado a la pestaña');
-    }
-    
-    // 3. Esperar a que la pestaña esté completamente cargada
-    await new Promise((resolve) => {
-        const checkTabLoaded = () => {
-            chrome.tabs.get(tab.id, (updatedTab) => {
-                if (updatedTab.status === 'complete') {
-                    console.log('✅ Pestaña cargada completamente');
-                    resolve();
-                } else {
-                    console.log('⏳ Esperando carga... status:', updatedTab.status);
-                    setTimeout(checkTabLoaded, 500);
-                }
-            });
-        };
-        checkTabLoaded();
-    });
-    
-    // 4. Detectar si es un sitio especial y esperar más tiempo
-    const isSpecialSite = tab.url.includes('facebook.com') || tab.url.includes('instagram.com') || 
-                         tab.url.includes('meta.ai') || tab.url.includes('messenger.com') ||
-                         tab.url.includes('copilot.microsoft.com') || tab.url.includes('github.com/features/copilot') ||
-                         tab.url.includes('grok.com') || tab.url.includes('x.ai') || tab.url.includes('deepseek.com') ||
-                         tab.url.includes('mistral.ai') || tab.url.includes('mail.google.com') || tab.url.includes('gmail.com') ||
-                         tab.url.includes('claude.ai') || tab.url.includes('openai.com') || tab.url.includes('gemini.google.com') ||
-                         tab.url.includes('perplexity.ai');
-    
-    // Esperar más tiempo para sitios especiales
-    const waitTime = isSpecialSite ? 4000 : 2500;
-    console.log(`⏱️ Esperando ${waitTime}ms para que el sitio se inicialice...`);
-    await new Promise(resolve => setTimeout(resolve, waitTime));
-
-    // 5. Enviar el texto
-    console.log('📤 Enviando texto:', textPrompt.substring(0, 50) + '...');
-    try {
-        // Intentar enviar el mensaje al content script
-        const result = await chrome.tabs.sendMessage(tab.id, {
-            action: 'insertarTexto',
-            texto: textPrompt
-        });
-        console.log('✅ Texto enviado exitosamente');
-        return result;
-    } catch (error) {
-        console.error('❌ Error enviando mensaje:', error);
-        // Si falla, intentar inyectar el content script y reintentar
-        try {
-            console.log('🔧 Intentando inyectar content script...');
-            await chrome.scripting.executeScript({
-                target: { tabId: tab.id },
-                files: ['content.js']
-            });
-            // Esperar un momento y reintentar
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            console.log('🔄 Reintentando envío...');
-            const result = await chrome.tabs.sendMessage(tab.id, {
-                action: 'insertarTexto',
-                texto: textPrompt
-            });
-            console.log('✅ Texto enviado exitosamente (segundo intento)');
-            return result;
-        } catch (retryError) {
-            console.error('❌ Error reintentando:', retryError);
-            throw retryError;
-        }
-    }
-}
-
-// Obtener texto seleccionado usando executeScript
+// Obtener texto seleccionado de la pestaña activa
 async function getSelectedText(tabId) {
     try {
         const results = await chrome.scripting.executeScript({
             target: { tabId: tabId },
             func: () => window.getSelection().toString()
         });
-        
-        if (results && results[0] && results[0].result) {
-            return results[0].result;
-        }
-        return '';
+        return (results && results[0] && results[0].result) ? results[0].result.trim() : '';
     } catch (error) {
-        console.log('⚠️ Error ejecutando script:', error);
+        console.warn('No se pudo obtener el texto seleccionado:', error.message);
         return '';
     }
 }
 
-// Actualizar preview del contexto
-async function updateContextPreview() {
+// Actualizar el campo de texto y el preview con el contexto
+async function updateContext() {
     try {
         const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        const contextPreview = document.getElementById('contextPreview');
-        
-        if (!currentTab.url || currentTab.url.startsWith('chrome://') || currentTab.url.startsWith('chrome-extension://')) {
-            contextPreview.textContent = '';
+        if (!currentTab?.url || currentTab.url.startsWith('chrome://')) {
             return;
         }
 
-        // Primero mostrar la URL mientras se obtiene la selección
-        contextPreview.textContent = currentTab.url;
-
-        try {
-            // Intentar obtener el texto seleccionado usando executeScript
-            const selection = await getSelectedText(currentTab.id);
-            
-            console.log('Selección recibida:', selection);
-            console.log('Tipo de selección:', typeof selection);
-            console.log('Longitud de selección:', selection.length);
-            console.log('Selección limpia:', selection ? selection.trim() : 'vacío');
-            
-            if (selection && typeof selection === 'string' && selection.trim() !== "") {
-                // Mostrar texto seleccionado (truncado a 200 caracteres para 2 líneas)
-                const cleanSelection = selection.trim();
-                const truncated = cleanSelection.length > 200 ? cleanSelection.substring(0, 200) + '...' : cleanSelection;
-                contextPreview.textContent = truncated;
-                console.log('✅ Mostrando texto seleccionado:', truncated);
-            } else {
-                // Mantener la URL ya mostrada
-                console.log('ℹ️ No hay selección, mostrando URL');
-            }
-        } catch (error) {
-            // Si no se puede obtener la selección, mantener la URL ya mostrada
-            console.log('⚠️ Error obteniendo selección:', error);
-        }
-    } catch (error) {
-        console.error('❌ Error actualizando preview:', error);
-    }
-}
-
-// Verificar si se abrió desde el menú contextual
-async function checkContextMenuData() {
-    try {
-        const data = await chrome.storage.local.get(['contextSelection', 'contextUrl', 'contextTimestamp']);
+        const contextPreview = document.getElementById('contextPreview');
+        const askInput = document.getElementById('askInput');
         
-        // Verificar si los datos son recientes (menos de 2 segundos)
-        if (data.contextTimestamp && (Date.now() - data.contextTimestamp) < 2000) {
-            console.log('📋 Datos del menú contextual detectados');
-            
-            // Marcar el checkbox automáticamente
-            document.getElementById('addContext').checked = true;
-            
-            // Actualizar el preview con los datos del contexto
-            const contextPreview = document.getElementById('contextPreview');
-            if (data.contextSelection) {
-                const truncated = data.contextSelection.length > 200 ? 
-                    data.contextSelection.substring(0, 200) + '...' : data.contextSelection;
-                contextPreview.textContent = truncated;
-                console.log('✅ Texto seleccionado cargado desde menú contextual');
-            } else if (data.contextUrl) {
-                contextPreview.textContent = data.contextUrl;
-                console.log('✅ URL cargada desde menú contextual');
+        // Prioridad 1: Datos del menú contextual
+        const contextData = await chrome.storage.local.get(['contextSelection', 'contextTimestamp']);
+        if (contextData.contextTimestamp && (Date.now() - contextData.contextTimestamp) < 2000) {
+            chrome.storage.local.remove(['contextSelection', 'contextTimestamp']); // Limpiar
+            if (contextData.contextSelection) {
+                const selection = contextData.contextSelection.trim();
+                askInput.value = selection;
+                contextPreview.textContent = selection.substring(0, 200) + (selection.length > 200 ? '...' : '');
+                console.log('Contexto cargado desde menú contextual.');
+                return;
             }
-            
-            // Limpiar los datos para que no se usen de nuevo
-            chrome.storage.local.remove(['contextSelection', 'contextUrl', 'contextTimestamp']);
-            
-            return true;
         }
+        
+        // Prioridad 2: Texto seleccionado en la pestaña activa
+        const selection = await getSelectedText(currentTab.id);
+        if (selection) {
+            contextPreview.textContent = selection.substring(0, 200) + (selection.length > 200 ? '...' : '');
+        } else {
+            contextPreview.textContent = currentTab.url;
+        }
+        console.log('Preview de contexto actualizado.');
+
     } catch (error) {
-        console.error('Error verificando datos del menú contextual:', error);
+        console.error('Error actualizando contexto:', error);
     }
-    return false;
 }
 
-// Inicializar
+
+// Inicialización del popup
 document.addEventListener('DOMContentLoaded', async function() {
     await loadUserPreference();
-    
-    // Verificar si se abrió desde el menú contextual
-    const fromContextMenu = await checkContextMenuData();
-    
-    // Si no es del menú contextual, actualizar el preview normalmente
-    if (!fromContextMenu) {
-        await updateContextPreview();
-    }
-    
-    // Mostrar prompts frecuentes
+    await updateContext();
     await displayFrequentPrompts();
     
-    // Poner el foco en el campo de pregunta
-    const askInput = document.getElementById('askInput');
-    askInput.focus();
+    document.getElementById('askInput').focus();
     
     document.querySelectorAll('input[name="aiService"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.checked) saveUserPreference(this.value);
-        });
+        radio.addEventListener('change', (event) => saveUserPreference(event.target.value));
     });
 
-    // Permitir enviar con Ctrl+Enter o Cmd+Enter
-    askInput.addEventListener('keydown', function(event) {
+    document.getElementById('askInput').addEventListener('keydown', (event) => {
         if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
             event.preventDefault();
             document.getElementById('yesButton').click();
         }
     });
+
+    document.getElementById('yesButton').addEventListener('click', handleAskButtonClick);
 });
 
-// Botón ASK
-document.getElementById('yesButton').addEventListener('click', async function() {
-    this.disabled = true;
-    
+
+// Manejador del botón "ASK"
+async function handleAskButtonClick() {
+    const button = this;
+    button.disabled = true;
+
     try {
         const selectedAI = getSelectedAI();
         if (!selectedAI) {
-            alert("Por favor selecciona un servicio de IA");
-            this.disabled = false;
+            alert("Por favor, selecciona un servicio de IA.");
             return;
         }
-        
-        // Obtener el texto del campo Ask to AI
+
         const textPrompt = document.getElementById('askInput').value.trim();
-        if (textPrompt === "") {
-            alert("Escribe una pregunta");
-            this.disabled = false;
+        if (!textPrompt) {
+            alert("Por favor, escribe una pregunta.");
             return;
         }
-        
-        // Si es "All AI", no hacer nada por ahora
-        if (selectedAI === 'allAI') {
-            console.log('All AI seleccionado - sin acción por ahora');
-            this.disabled = false;
-            return;
-        }
-        
-        // Obtener la URL de la AI seleccionada
-        const url = AI_URLS[selectedAI];
-        if (!url) {
-            alert(`No hay URL definida para ${selectedAI}`);
-            this.disabled = false;
-            return;
-        }
-        
+
         // Guardar el prompt en el historial
         await savePromptUsage(textPrompt);
-        
-        // Abrir nueva pestaña con la URL de la AI
-        console.log(`🔵 Abriendo ${selectedAI}...`);
-        const newTab = await chrome.tabs.create({ url: url, active: true });
-        
-        // Esperar a que la pestaña se cargue completamente
-        await new Promise((resolve) => {
-            const checkTabLoaded = () => {
-                chrome.tabs.get(newTab.id, (tab) => {
-                    if (tab.status === 'complete') {
-                        console.log('✅ Pestaña cargada completamente');
-                        resolve();
-                    } else {
-                        setTimeout(checkTabLoaded, 500);
-                    }
-                });
-            };
-            checkTabLoaded();
+
+        // Enviar la petición al script de fondo (background.js) para que la procese
+        console.log(`Enviando petición a background para '${selectedAI}'...`);
+        chrome.runtime.sendMessage({
+            action: 'sendToAI',
+            aiService: selectedAI,
+            prompt: textPrompt
         });
-        
-        // Esperar tiempo adicional para que el sitio se inicialice completamente
-        const waitTime = 8000; // 8 segundos para asegurar que la página esté lista
-        console.log(`⏱️ Esperando ${waitTime}ms para que el sitio se inicialice...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
-        
-        // Enviar el texto a la pestaña
-        console.log('📤 Enviando texto:', textPrompt.substring(0, 50) + '...');
-        try {
-            await chrome.tabs.sendMessage(newTab.id, {
-                action: 'insertarTexto',
-                texto: textPrompt
-            });
-            console.log('✅ Texto enviado exitosamente');
-        } catch (error) {
-            console.error('❌ Error enviando mensaje:', error);
-            // Intentar inyectar el content script y reintentar
-            try {
-                console.log('🔧 Intentando inyectar content script...');
-                await chrome.scripting.executeScript({
-                    target: { tabId: newTab.id },
-                    files: ['content.js']
-                });
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                console.log('🔄 Reintentando envío...');
-                await chrome.tabs.sendMessage(newTab.id, {
-                    action: 'insertarTexto',
-                    texto: textPrompt
-                });
-                console.log('✅ Texto enviado exitosamente (segundo intento)');
-            } catch (retryError) {
-                console.error('❌ Error reintentando:', retryError);
-            }
-        }
-        
-        // Limpiar el cuadro de texto después de enviar
+
+        // Limpiar el campo de texto y cerrar el popup
         document.getElementById('askInput').value = '';
-        
+        // window.close(); // Opcional: cerrar el popup automáticamente
+
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error al abrir la AI: ' + error.message);
+        console.error('Error en el popup:', error);
+        alert('Se produjo un error: ' + error.message);
     } finally {
-        this.disabled = false;
+        button.disabled = false;
     }
-}); 
+}
