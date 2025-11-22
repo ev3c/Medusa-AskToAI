@@ -33,42 +33,74 @@ function detectarSitio() {
 
 // Selectores específicos por sitio web
 function obtenerSelectores(sitio) {
-    const selectores = {
+  const selectores = {
     chatgpt: [
+      'textarea[id="prompt-textarea"]',
       'textarea[data-id]',
       'textarea[id*="prompt"]',
-      '#prompt-textarea',
       'textarea[placeholder*="Message"]',
       'textarea[placeholder*="mensaje"]',
-      'div[contenteditable="true"][role="textbox"]',
-      'main textarea',
-      'form textarea'
+      'div[contenteditable="true"][role="textbox"]'
     ],
     gemini: [
       'div[contenteditable="true"][data-placeholder*="Enter a prompt"]',
       'div[contenteditable="true"][data-placeholder*="Introduce un mensaje"]',
-      'div[contenteditable="true"][role="textbox"]',
       'rich-textarea div[contenteditable="true"]',
       '.ql-editor[contenteditable="true"]'
     ],
-    google: [ 'input[name="q"]', 'textarea[name="q"]', '#searchboxinput', '.gLFyf' ],
-    meta: [ 'div[contenteditable="true"][role="textbox"]', 'textarea[placeholder*="What\'s on your mind"]' ],
-    wikipedia: [ 'input[name="search"]', 'input#searchInput' ],
-    claude: [ 'div[contenteditable="true"][role="textbox"]', 'textarea[placeholder*="Talk to Claude"]' ],
-    copilot: [ 'cib-text-input textarea', 'textarea[placeholder*="Ask me anything"]' ],
-    deepseek: [ 'textarea[placeholder*="Send a message"]', 'div[contenteditable="true"][role="textbox"]' ],
-    grok: [ 'textarea[data-testid*="compose"]', 'div[contenteditable="true"][role="textbox"]' ],
-    mistral: [ 'textarea[placeholder*="Send a message"]', 'div[contenteditable="true"][role="textbox"]' ],
-    perplexity: [ 'textarea[class*="TextareaAutosize"]', 'textarea[placeholder*="Ask anything"]' ],
+    claude: [
+      'div.ProseMirror',
+      'textarea[placeholder*="Talk to Claude"]',
+      'div[contenteditable="true"][role="textbox"]'
+    ],
+    copilot: [
+      'cib-text-input textarea',
+      'textarea[placeholder*="Ask me anything"]',
+      'textarea[placeholder*="Message Copilot"]',
+      'textarea[placeholder*="Enviar un mensaje a Copilot"]',
+      'div[contenteditable="true"][data-placeholder*="Ask"]'
+    ],
+    deepseek: [
+      'textarea[placeholder*="Send a message"]',
+      'textarea[placeholder*="Mensaje a DeepSeek"]',
+      'textarea[placeholder*="Type your message"]',
+      'textarea[placeholder*="Ask DeepSeek"]',
+      'div[contenteditable="true"][role="textbox"]',
+      'textarea[data-testid*="chat-input"]'
+    ],
+    grok: [
+      'textarea[data-testid="compose-textarea"]',
+      'textarea[placeholder*="Ask Grok"]',
+      'textarea[placeholder*="How can Grok help you?"]',
+      'textarea[placeholder*="What do you want to know?"]',
+      'div[contenteditable="true"][role="textbox"]'
+    ],
+    meta: [
+      'div[aria-label*="Send a message"]',
+      'textarea[placeholder*="What\'s on your mind"]',
+      'textarea[placeholder*="Pregunta lo que quieras..."]',
+      'div[role="textbox"]'
+    ],
+    mistral: [
+      'textarea[placeholder*="Send a message"]',
+      'textarea[placeholder*="Ask Mistral"]',
+      'textarea[placeholder*="Pregunta lo que quieras a Le Chat"]',
+      'div[contenteditable="true"][role="textbox"]'
+    ],
+    perplexity: [
+      'textarea[placeholder*="Ask anything"]',
+      'textarea[placeholder*="Pregunta cualquier cosa. Escribe @ para menciones."]',
+      'textarea[placeholder*="Follow up"]',
+      'textarea[class*="TextareaAutosize"]'
+    ],
+    google: [ 'textarea[name="q"]', 'input[name="q"]' ],
     generico: [
       'textarea:not([disabled])',
       'input[type="text"]:not([disabled])',
-      'input[type="search"]:not([disabled])',
       'div[contenteditable="true"]',
       '[role="textbox"]'
     ]
   };
-  
   return selectores[sitio] || selectores.generico;
 }
 
