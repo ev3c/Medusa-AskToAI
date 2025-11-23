@@ -26,6 +26,8 @@ function detectarSitio() {
     return 'grok';
   } else if (hostname.includes('mistral.ai') || hostname.includes('chat.mistral.ai')) {
     return 'mistral';
+  } else if (hostname.includes('perplexity.ai')) {
+    return 'perplexity';
   } else if (hostname.includes('mail.google.com') || hostname.includes('gmail.com')) {
     return 'gmail';
   } else {
@@ -184,6 +186,17 @@ function obtenerSelectores(sitio) {
         'button[class*="absolute"] > svg', 'form button[type="submit"]', 'button > svg'
       ]
     },
+    perplexity: {
+      input: [
+        '#ask-input',
+        'div[data-lexical-editor="true"]',
+        'textarea[placeholder*="Ask anything..."]'
+      ],
+      sendButton: [
+        'button[aria-label="Submit"]',
+        'button[type="submit"]'
+      ]
+    },
     gmail: {
       input: [
         'div[contenteditable="true"][role="textbox"]', 'div[contenteditable="true"][aria-label*="Message Body"]',
@@ -271,8 +284,8 @@ function enviarTextoUniversal(texto, submit = false) {
                 console.log('📝 Insertando en elemento contentEditable...');
                 
                 // Para Gemini y otros editores rich text
-                if (sitio === 'gemini') {
-                  // Método específico y simplificado para Gemini
+                if (sitio === 'gemini' || sitio === 'claude' || sitio === 'perplexity') {
+                  // Método específico y simplificado para Gemini y Claude
                   // 1. Limpiar el campo
                   elemento.textContent = '';
                   elemento.innerHTML = '';

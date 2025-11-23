@@ -7,7 +7,7 @@
       "web": "https://chat.openai.com",
       "web2": "https://chatgpt.com",
       "icono": "/src/assets/images/chatgpt.png",
-      "segundos": 1,
+      "segundos": 1.5,
       "modelos": [
         "GPT-3.5",
         "GPT-4",
@@ -17,6 +17,37 @@
     },
     {
       "orden": 2,
+      "id": "claude",
+      "nombre": "Claude",
+      "web": "https://claude.ai",
+      "web2": "https://claude.ai",
+      "icono": "/src/assets/images/claude-color.png",
+      "segundos": 2,
+      "modelos": [
+        "Claude 2",
+        "Claude 3 Opus",
+        "Claude 3 Sonnet",
+        "Claude 3 Haiku"
+      ],
+      "empresa": "Anthropic"
+    },
+    {
+      "orden": 3,
+      "id": "deepseek",
+      "nombre": "DeepSeek",
+      "web": "https://chat.deepseek.com",
+      "web2": "https://chat.deepseek.com",
+      "icono": "/src/assets/images/deepseek-color.png",
+      "segundos": 1.5,
+      "modelos": [
+        "DeepSeek-7B",
+        "DeepSeek-67B",
+        "DeepSeek Coder"
+      ],
+      "empresa": "DeepSeek"
+    },
+    {
+      "orden": 4,
       "id": "copilot",
       "nombre": "Copilot",
       "web": "https://copilot.microsoft.com",
@@ -31,7 +62,35 @@
       "empresa": "Microsoft"
     },
     {
-      "orden": 3,
+      "orden": 5,
+      "id": "gemini",
+      "nombre": "Gemini",
+      "web": "https://gemini.google.com",
+      "web2": "https://gemini.google.com",
+      "icono": "/src/assets/images/gemini-color.png",
+      "segundos": 1.5,
+      "modelos": [
+        "Gemini Ultra",
+        "Gemini Pro",
+        "Gemini Nano"
+      ],
+      "empresa": "Google"
+    },
+    {
+      "orden": 6,
+      "id": "grok",
+      "nombre": "Grok",
+      "web": "https://grok.com",
+      "web2": "https://grok.com",
+      "icono": "/src/assets/images/groc.png",
+      "segundos": 1.5,
+      "modelos": [
+        "Grok-1"
+      ],
+      "empresa": "xAI"
+    },
+    {
+      "orden": 7,
       "id": "meta",
       "nombre": "Meta",
       "web": "https://meta.ai",
@@ -46,44 +105,13 @@
       "empresa": "Meta"
     },
     {
-      "orden": 4,
-      "id": "claude",
-      "nombre": "Claude",
-      "web": "https://claude.ai",
-      "web2": "https://claude.ai",
-      "icono": "/src/assets/images/claude-color.png",
-      "segundos": 1,
-      "modelos": [
-        "Claude 2",
-        "Claude 3 Opus",
-        "Claude 3 Sonnet",
-        "Claude 3 Haiku"
-      ],
-      "empresa": "Anthropic"
-    },
-    {
-      "orden": 5,
-      "id": "deepseek",
-      "nombre": "DeepSeek",
-      "web": "https://chat.deepseek.com",
-      "web2": "https://chat.deepseek.com",
-      "icono": "/src/assets/images/deepseek-color.png",
-      "segundos": 1,
-      "modelos": [
-        "DeepSeek-7B",
-        "DeepSeek-67B",
-        "DeepSeek Coder"
-      ],
-      "empresa": "DeepSeek"
-    },
-    {
-      "orden": 6,
+      "orden": 8,
       "id": "mistral",
       "nombre": "Mistral",
       "web": "https://chat.mistral.ai",
       "web2": "https://chat.mistral.ai",
       "icono": "/src/assets/images/mistral-color.png",
-      "segundos": 1,
+      "segundos": 1.5,
       "modelos": [
         "Mistral 7B",
         "Mixtral 8x7B",
@@ -92,32 +120,17 @@
       "empresa": "Mistral AI"
     },
     {
-      "orden": 7,
-      "id": "gemini",
-      "nombre": "Gemini",
-      "web": "https://gemini.google.com",
-      "web2": "https://gemini.google.com",
-      "icono": "/src/assets/images/gemini-color.png",
-      "segundos": 1,
+      "orden": 9,
+      "id": "perplexity",
+      "nombre": "Perplexity",
+      "web": "https://www.perplexity.ai",
+      "web2": "https://www.perplexity.ai",
+      "icono": "/src/assets/images/perplexity.png",
+      "segundos": 2,
       "modelos": [
-        "Gemini Ultra",
-        "Gemini Pro",
-        "Gemini Nano"
+        "Perplexity"
       ],
-      "empresa": "Google"
-    },
-    {
-      "orden": 8,
-      "id": "grok",
-      "nombre": "Grok",
-      "web": "https://grok.com",
-      "web2": "https://grok.com",
-      "icono": "/src/assets/images/groc.png",
-      "segundos": 1,
-      "modelos": [
-        "Grok-1"
-      ],
-      "empresa": "xAI"
+      "empresa": "Perplexity AI"
     },
     {
       "id": "allai",

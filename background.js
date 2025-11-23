@@ -104,29 +104,26 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 // NUEVA LÓGICA DE ORQUESTACIÓN (REPLICADA DE AI-PROMPT-ASSISTANT)
 // =================================================================================
 
-let motorAI_data = null;
+let motorDataCache = null;
 
-async function getAIUrls() {
-  if (motorAI_data) {
-    return motorAI_data;
+async function getMotorData() {
+  if (motorDataCache) {
+    return motorDataCache;
   }
   try {
     const response = await fetch(chrome.runtime.getURL('motorAI.json'));
     const data = await response.json();
-    const urls = {};
-    for (const motor of data.motoresIA) {
-      urls[motor.id] = {
-        web1: motor.web,
-        web2: motor.web2,
-        waitSeconds: motor.segundos
-      };
-    }
-    motorAI_data = urls;
-    return urls;
+    motorDataCache = data.motoresIA;
+    return motorDataCache;
   } catch (error) {
     console.error('Error loading motorAI.json:', error);
-    return {};
+    return [];
   }
+}
+
+async function getAIConfig(aiId) {
+    const motors = await getMotorData();
+    return motors.find(m => m.id === aiId);
 }
 
 
@@ -134,8 +131,7 @@ async function getAIUrls() {
  * Busca o abre la pestaña de la IA y envía el prompt usando content script.
  */
 async function openAIWithPrompt(prompt, aiModel, submit = true) {
-  const AI_URLS = await getAIUrls();
-
+  
   // Helper para esperar a que una pestaña cargue o recargue completamente
   const waitForTabLoad = (tabId) => {
     return new Promise(resolve => {
@@ -151,12 +147,12 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
 
   // Helper para procesar una IA: la busca, la activa, la recarga (si es nueva) y le envía el prompt
   const processAI = async (ai) => {
-    if (!AI_URLS[ai]) {
+    const aiConfig = await getAIConfig(ai);
+    if (!aiConfig) {
       console.error(`Configuración para ${ai} no encontrada.`);
       return;
     }
 
-    const aiUrls = AI_URLS[ai];
     const allTabs = await chrome.tabs.query({});
 
     // Lógica mejorada para encontrar una pestaña existente
@@ -167,10 +163,10 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
         if (ai === 'meta') return tabHostname.includes('meta.ai');
         if (ai === 'google') return tabHostname.includes('google.com') && !tabHostname.includes('mail.google.com');
 
-        const web1Hostname = new URL(aiUrls.web1).hostname.toLowerCase().replace('www.', '');
+        const web1Hostname = new URL(aiConfig.web).hostname.toLowerCase().replace('www.', '');
         let matches = tabHostname.includes(web1Hostname);
-        if (aiUrls.web2) {
-          const web2Hostname = new URL(aiUrls.web2).hostname.toLowerCase().replace('www.', '');
+        if (aiConfig.web2) {
+          const web2Hostname = new URL(aiConfig.web2).hostname.toLowerCase().replace('www.', '');
           matches = matches || tabHostname.includes(web2Hostname);
         }
         return matches;
@@ -188,7 +184,7 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
       console.log(`➡️ Pestaña ${ai} activada sin recargar.`);
     } else {
       console.log(`❌ No se encontró pestaña para ${ai}, creando nueva.`);
-      tabToUse = await chrome.tabs.create({ url: aiUrls.web1, active: false });
+      tabToUse = await chrome.tabs.create({ url: aiConfig.web, active: false });
       await waitForTabLoad(tabToUse.id);
       console.log(`✅ Pestaña nueva ${ai} cargada.`);
       
@@ -206,7 +202,15 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
 
   // Lógica principal: procesar todas las IAs o solo una.
   if (aiModel === 'allai' || aiModel === 'allAI') { // Soporta ambas capitalizaciones
-    const supportedAIs = ['chatgpt', 'copilot', 'meta', 'claude', 'deepseek', 'mistral', 'gemini', 'grok', 'google'];
+    console.log('🤖 Procesando All AI en el orden especificado...');
+    const allMotors = await getMotorData();
+    const supportedAIs = allMotors
+      .filter(m => m.orden) // Filtrar solo los que tienen la propiedad 'orden'
+      .sort((a, b) => a.orden - b.orden) // Ordenar por 'orden'
+      .map(m => m.id); // Obtener solo los IDs
+
+    console.log('📋 Orden de IAs a procesar:', supportedAIs);
+
     for (const ai of supportedAIs) {
       try {
         await processAI(ai, submit);
@@ -229,13 +233,13 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
  * Envía el prompt al content script de la pestaña, respetando los tiempos de espera.
  */
 async function sendPromptToTab(tabId, prompt, aiModel, submit = true) {
-  const AI_URLS = await getAIUrls();
+  const aiConfig = await getAIConfig(aiModel);
   // Valor por defecto de 1.5 segundos si no se especifica.
   let delay = 1500; 
 
-  if (aiModel && AI_URLS[aiModel] && AI_URLS[aiModel].waitSeconds) {
+  if (aiConfig && aiConfig.segundos) {
     // Si hay un valor específico en motorAI.json, lo usamos (convertido a ms).
-    delay = AI_URLS[aiModel].waitSeconds * 1000;
+    delay = aiConfig.segundos * 1000;
     console.log(`⏳ Usando delay específico para ${aiModel}: ${delay}ms`);
   } else {
     console.log(`⏳ Usando delay por defecto para ${aiModel || 'AI desconocida'}: ${delay}ms`);
