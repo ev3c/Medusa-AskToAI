@@ -110,8 +110,15 @@ function obtenerSelectores(sitio) {
     },
     claude: {
       input: [
-        'textarea[placeholder*="Talk to Claude"]', 'textarea[placeholder*="Habla con Claude"]',
-        'div[contenteditable="true"]', 'main textarea', '[role="textbox"]', 'textarea'
+        // Selector específico para el editor de Claude
+        'div[data-testid="chat-input"]',
+        'div.tiptap.ProseMirror[contenteditable="true"]',
+        // Selectores de respaldo
+        'textarea[placeholder*="Talk to Claude"]',
+        'textarea[placeholder*="Habla con Claude"]',
+        'div[contenteditable="true"]',
+        '[role="textbox"]',
+        'textarea'
       ],
       sendButton: [
         'button[aria-label="Send Message"]', 'button[aria-label="Enviar mensaje"]', 'form button[type="submit"]'
