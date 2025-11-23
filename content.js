@@ -145,9 +145,16 @@ function obtenerSelectores(sitio) {
     },
     grok: {
       input: [
+        // Selector específico para el editor Tiptap/ProseMirror de Grok
+        'div.tiptap.ProseMirror[contenteditable="true"]',
+        // Selectores de respaldo que estaban antes
+        'textarea[placeholder*="Ask Grok"]',
         'textarea[placeholder*="¿Qué quieres saber?"]',
-        'textarea[placeholder*="Ask Grok"]', 'div[contenteditable="true"][role="textbox"]',
-        'textarea[data-testid*="compose"]', 'main textarea', '[role="textbox"]', 'textarea'
+        'div[contenteditable="true"][role="textbox"]',
+        'textarea[data-testid*="compose"]',
+        'main textarea',
+        '[role="textbox"]',
+        'textarea'
       ],
       sendButton: [
         // Selector de alta prioridad y muy específico basado en el HTML actual.
