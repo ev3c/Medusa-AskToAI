@@ -1,0 +1,145 @@
+{
+  "motoresIA": [
+    {
+      "orden": 1,
+      "id": "chatgpt",
+      "nombre": "ChatGPT",
+      "web": "https://chat.openai.com",
+      "web2": "https://chatgpt.com",
+      "icono": "/src/assets/images/chatgpt.png",
+      "segundos": 1,
+      "modelos": [
+        "GPT-3.5",
+        "GPT-4",
+        "GPT-4 Turbo"
+      ],
+      "empresa": "OpenAI"
+    },
+    {
+      "orden": 2,
+      "id": "copilot",
+      "nombre": "Copilot",
+      "web": "https://copilot.microsoft.com",
+      "web2": "https://copilot.microsoft.com",
+      "icono": "/src/assets/images/copilot-color.png",
+      "segundos": 2,
+      "modelos": [
+        "GitHub Copilot",
+        "Microsoft Copilot",
+        "Copilot Pro"
+      ],
+      "empresa": "Microsoft"
+    },
+    {
+      "orden": 3,
+      "id": "meta",
+      "nombre": "Meta",
+      "web": "https://meta.ai",
+      "web2": "https://meta.ai",
+      "icono": "/src/assets/images/meta-color.png",
+      "segundos": 2.5,
+      "modelos": [
+        "Llama 3 8B",
+        "Llama 3 70B",
+        "Llama 3 405B"
+      ],
+      "empresa": "Meta"
+    },
+    {
+      "orden": 4,
+      "id": "claude",
+      "nombre": "Claude",
+      "web": "https://claude.ai",
+      "web2": "https://claude.ai",
+      "icono": "/src/assets/images/claude-color.png",
+      "segundos": 1,
+      "modelos": [
+        "Claude 2",
+        "Claude 3 Opus",
+        "Claude 3 Sonnet",
+        "Claude 3 Haiku"
+      ],
+      "empresa": "Anthropic"
+    },
+    {
+      "orden": 5,
+      "id": "deepseek",
+      "nombre": "DeepSeek",
+      "web": "https://chat.deepseek.com",
+      "web2": "https://chat.deepseek.com",
+      "icono": "/src/assets/images/deepseek-color.png",
+      "segundos": 1,
+      "modelos": [
+        "DeepSeek-7B",
+        "DeepSeek-67B",
+        "DeepSeek Coder"
+      ],
+      "empresa": "DeepSeek"
+    },
+    {
+      "orden": 6,
+      "id": "mistral",
+      "nombre": "Mistral",
+      "web": "https://chat.mistral.ai",
+      "web2": "https://chat.mistral.ai",
+      "icono": "/src/assets/images/mistral-color.png",
+      "segundos": 1,
+      "modelos": [
+        "Mistral 7B",
+        "Mixtral 8x7B",
+        "Mistral Large"
+      ],
+      "empresa": "Mistral AI"
+    },
+    {
+      "orden": 7,
+      "id": "gemini",
+      "nombre": "Gemini",
+      "web": "https://gemini.google.com",
+      "web2": "https://gemini.google.com",
+      "icono": "/src/assets/images/gemini-color.png",
+      "segundos": 1,
+      "modelos": [
+        "Gemini Ultra",
+        "Gemini Pro",
+        "Gemini Nano"
+      ],
+      "empresa": "Google"
+    },
+    {
+      "orden": 8,
+      "id": "grok",
+      "nombre": "Grok",
+      "web": "https://grok.com",
+      "web2": "https://grok.com",
+      "icono": "/src/assets/images/groc.png",
+      "segundos": 1,
+      "modelos": [
+        "Grok-1"
+      ],
+      "empresa": "xAI"
+    },
+    {
+      "id": "allai",
+      "nombre": "All AI's",
+      "web": "https://chat.openai.com",
+      "web2": "https://chat.openai.com",
+      "icono": "/src/assets/images/All-AI.png",
+      "segundos": 0.5,
+      "modelos": [
+        "All Models"
+      ],
+      "empresa": "Multiple"
+    },
+    {
+      "id": "otros",
+      "nombre": "Otros",
+      "modelos": [
+        "Falcon",
+        "BLOOM",
+        "PaLM"
+      ],
+      "empresa": "Varios"
+    }
+  ]
+}
