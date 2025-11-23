@@ -199,9 +199,11 @@ function obtenerSelectores(sitio) {
       input: [
         '#ask-input',
         'div[data-lexical-editor="true"]',
+        'div[aria-placeholder*="Pregunta cualquier cosa"]',
         'textarea[placeholder*="Ask anything..."]'
       ],
       sendButton: [
+        'button[aria-label="Enviar"]',
         'button[aria-label="Submit"]',
         'button[type="submit"]'
       ]
@@ -293,7 +295,29 @@ function enviarTextoUniversal(texto, submit = false) {
                 console.log('📝 Insertando en elemento contentEditable...');
                 
                 // Para Gemini y otros editores rich text
-                if (sitio === 'gemini' || sitio === 'claude' || sitio === 'perplexity') {
+                if (sitio === 'perplexity') {
+                  // Perplexity usa un editor Lexical que es complejo. La mejor manera de insertar
+                  // texto es simular un evento de "pegado" (paste).
+                  console.log('🔧 Usando método de inserción por "pegado" para Perplexity...');
+                  
+                  // 1. Enfocar el elemento para que sea el objetivo de los eventos.
+                  elemento.focus();
+                  
+                  // 2. Crear un objeto DataTransfer para contener el texto.
+                  const dataTransfer = new DataTransfer();
+                  dataTransfer.setData('text/plain', texto);
+
+                  // 3. Crear un evento de pegado (ClipboardEvent).
+                  const pasteEvent = new ClipboardEvent('paste', {
+                      clipboardData: dataTransfer,
+                      bubbles: true,
+                      cancelable: true
+                  });
+
+                  // 4. Despachar el evento en el elemento. El editor debería manejarlo.
+                  elemento.dispatchEvent(pasteEvent);
+
+                } else if (sitio === 'gemini' || sitio === 'claude') {
                   // Método específico y simplificado para Gemini y Claude
                   // 1. Limpiar el campo
                   elemento.textContent = '';
