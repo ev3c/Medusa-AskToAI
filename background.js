@@ -194,6 +194,11 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
       await chrome.tabs.reload(tabToUse.id);
       await waitForTabLoad(tabToUse.id);
       console.log(`✅ Pestaña ${ai} recargada.`);
+
+      // NUEVO: Delay de apertura solo para pestañas nuevas
+      const openDelay = (aiConfig.segundosApertura || 1.5) * 1000;
+      console.log(`⏳ Esperando ${openDelay}ms después de abrir la nueva pestaña...`);
+      await new Promise(resolve => setTimeout(resolve, openDelay));
     }
 
     // Enviar el prompt con el tiempo de espera específico de la IA.
@@ -234,17 +239,17 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
  */
 async function sendPromptToTab(tabId, prompt, aiModel, submit = true) {
   const aiConfig = await getAIConfig(aiModel);
-  // Valor por defecto de 1.5 segundos si no se especifica.
-  let delay = 1500; 
+  // Valor por defecto de 0.5 segundos si no se especifica.
+  let delay = 500; 
 
-  if (aiConfig && aiConfig.segundos) {
+  if (aiConfig && aiConfig.segundosEnvioMensaje) {
     // Si hay un valor específico en motorAI.json, lo usamos (convertido a ms).
-    delay = aiConfig.segundos * 1000;
-    console.log(`⏳ Usando delay específico para ${aiModel}: ${delay}ms`);
+    delay = aiConfig.segundosEnvioMensaje * 1000;
+    console.log(`⏳ Usando delay de envío de mensaje para ${aiModel}: ${delay}ms`);
   } else {
-    console.log(`⏳ Usando delay por defecto para ${aiModel || 'AI desconocida'}: ${delay}ms`);
+    console.log(`⏳ Usando delay de envío por defecto para ${aiModel || 'AI desconocida'}: ${delay}ms`);
   }
-
+  
   // Asegurarse de que el content script esté inyectado y listo.
   try {
     await chrome.scripting.executeScript({
