@@ -63,11 +63,20 @@ function obtenerSelectores(sitio) {
     },
     google: {
       input: [
+        // Selectors for AI follow-up questions
+        'textarea[placeholder*="Pregunta lo que quieras"]',
+        'textarea[placeholder*="Ask anything..."]',
+        'textarea[aria-label*="Pregunta lo que quieras"]',
+        'textarea[aria-label*="Ask anything..."]',
+        // Original selectors for standard search
         'input[name="q"]', 'textarea[name="q"]', 'input[title*="Buscar"]',
         'input[title*="Search"]', 'input[role="combobox"]', 'input[type="search"]',
         '#searchboxinput', '.gLFyf'
       ],
       sendButton: [
+        // Selector for AI send button
+        'button[aria-label*="Send"]', 'button[aria-label*="Enviar"]',
+        // Original selectors
         'input[name="btnK"]', 'button[aria-label*="Search"]', 'button[aria-label*="Buscar"]', 'form[role="search"] button'
       ]
     },

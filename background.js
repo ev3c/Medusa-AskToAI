@@ -160,9 +160,13 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
     if (!tab.url) return false;
       try {
         const tabHostname = new URL(tab.url).hostname.toLowerCase();
-        if (ai === 'meta') return tabHostname.includes('meta.ai');
-        if (ai === 'google') return tabHostname.includes('google.com') && !tabHostname.includes('mail.google.com');
 
+        // google.com/ai redirige a gemini.google.com, así que buscamos esa URL.
+        if (ai === 'google') {
+          return tab.url.startsWith('https://gemini.google.com');
+        }
+        if (ai === 'meta') return tabHostname.includes('meta.ai');
+        
         const web1Hostname = new URL(aiConfig.web).hostname.toLowerCase().replace('www.', '');
         let matches = tabHostname.includes(web1Hostname);
         if (aiConfig.web2) {
@@ -218,7 +222,7 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
 
     for (const ai of supportedAIs) {
       try {
-        await processAI(ai, submit);
+        await processAI(ai);
       } catch (error) {
         console.error(`Error procesando ${ai}:`, error);
       }
@@ -226,7 +230,7 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
   } else {
     // Procesar una única IA
     try {
-      await processAI(aiModel, submit);
+      await processAI(aiModel);
     } catch (error)
     {
       console.error(`Error procesando ${aiModel}:`, error);

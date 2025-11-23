@@ -6,7 +6,7 @@
       "nombre": "ChatGPT",
       "web": "https://chat.openai.com",
       "web2": "https://chatgpt.com",
-      "icono": "/src/assets/images/chatgpt.png",
+      "icono": "images/chatgpt.png",
       "segundosApertura": 1.5,
       "segundosEnvioMensaje": 0.5,
       "modelos": [
@@ -22,7 +22,7 @@
       "nombre": "Claude",
       "web": "https://claude.ai",
       "web2": "https://claude.ai",
-      "icono": "/src/assets/images/claude-color.png",
+      "icono": "images/claude-color.png",
       "segundosApertura": 2,
       "segundosEnvioMensaje": 0.5,
       "modelos": [
@@ -39,7 +39,7 @@
       "nombre": "DeepSeek",
       "web": "https://chat.deepseek.com",
       "web2": "https://chat.deepseek.com",
-      "icono": "/src/assets/images/deepseek-color.png",
+      "icono": "images/deepseek-color.png",
       "segundosApertura": 1.5,
       "segundosEnvioMensaje": 0.5,
       "modelos": [
@@ -55,7 +55,7 @@
       "nombre": "Copilot",
       "web": "https://copilot.microsoft.com",
       "web2": "https://copilot.microsoft.com",
-      "icono": "/src/assets/images/copilot-color.png",
+      "icono": "images/copilot-color.png",
       "segundosApertura": 2,
       "segundosEnvioMensaje": 0.5,
       "modelos": [
@@ -71,7 +71,7 @@
       "nombre": "Gemini",
       "web": "https://gemini.google.com",
       "web2": "https://gemini.google.com",
-      "icono": "/src/assets/images/gemini-color.png",
+      "icono": "images/gemini-color.png",
       "segundosApertura": 1.5,
       "segundosEnvioMensaje": 0.5,
       "modelos": [
@@ -87,7 +87,7 @@
       "nombre": "Grok",
       "web": "https://grok.com",
       "web2": "https://grok.com",
-      "icono": "/src/assets/images/groc.png",
+      "icono": "images/grok.png",
       "segundosApertura": 1.5,
       "segundosEnvioMensaje": 0.5,
       "modelos": [
@@ -101,7 +101,7 @@
       "nombre": "Meta",
       "web": "https://meta.ai",
       "web2": "https://meta.ai",
-      "icono": "/src/assets/images/meta-color.png",
+      "icono": "images/meta-color.png",
       "segundosApertura": 2.5,
       "segundosEnvioMensaje": 0.5,
       "modelos": [
@@ -117,7 +117,7 @@
       "nombre": "Mistral",
       "web": "https://chat.mistral.ai",
       "web2": "https://chat.mistral.ai",
-      "icono": "/src/assets/images/mistral-color.png",
+      "icono": "images/mistral-color.png",
       "segundosApertura": 1.5,
       "segundosEnvioMensaje": 0.5,
       "modelos": [
@@ -133,7 +133,7 @@
       "nombre": "Perplexity",
       "web": "https://www.perplexity.ai",
       "web2": "https://www.perplexity.ai",
-      "icono": "/src/assets/images/perplexity.png",
+      "icono": "images/perplexity.png",
       "segundosApertura": 2,
       "segundosEnvioMensaje": 0.5,
       "modelos": [
@@ -142,11 +142,26 @@
       "empresa": "Perplexity AI"
     },
     {
+      "orden": 10,
+      "id": "google",
+      "nombre": "Google",
+      "web": "https://google.com/ai",
+      "web2": "https://google.com/ai",
+      "icono": "images/google-color.png",
+      "segundosApertura": 1,
+      "segundosEnvioMensaje": 0.5,
+      "iaModeSelector": "[data-value='gsi']",
+      "modelos": [
+        "Google Search"
+      ],
+      "empresa": "Google"
+    },
+    {
       "id": "allai",
       "nombre": "All AI's",
       "web": "https://chat.openai.com",
       "web2": "https://chat.openai.com",
-      "icono": "/src/assets/images/All-AI.png",
+      "icono": "images/all-ai.png",
       "segundosApertura": 0.5,
       "segundosEnvioMensaje": 0.5,
       "modelos": [
