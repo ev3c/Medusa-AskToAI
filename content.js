@@ -10,7 +10,7 @@ function detectarSitio() {
     return 'chatgpt';
   } else if (hostname.includes('gemini.google.com')) {
     return 'gemini';
-  } else if (hostname.includes('google.com') && !hostname.includes('mail.google.com')) {
+  } else if (hostname.includes('google.com') && !hostname.includes('mail.google.com') && !hostname.includes('gemini.google.com')) {
     return 'google';
   } else if (hostname.includes('facebook.com') || hostname.includes('meta.ai')) {
     return 'meta';
@@ -22,7 +22,7 @@ function detectarSitio() {
     return 'copilot';
   } else if (hostname.includes('deepseek.com') || hostname.includes('chat.deepseek.com')) {
     return 'deepseek';
-      } else if (hostname.includes('grok.com')) {
+  } else if (hostname.includes('grok.com')) {
     return 'grok';
   } else if (hostname.includes('mistral.ai') || hostname.includes('chat.mistral.ai')) {
     return 'mistral';

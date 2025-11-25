@@ -158,13 +158,10 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
     // Lógica mejorada para encontrar una pestaña existente
     let targetTab = allTabs.find(tab => {
     if (!tab.url) return false;
+    if (ai === 'google') return false; // Omitir la reutilización para Google
       try {
         const tabHostname = new URL(tab.url).hostname.toLowerCase();
 
-        // google.com/ai redirige a gemini.google.com, así que buscamos esa URL.
-        if (ai === 'google') {
-          return tab.url.startsWith('https://gemini.google.com');
-        }
         if (ai === 'meta') return tabHostname.includes('meta.ai');
         
         const web1Hostname = new URL(aiConfig.web).hostname.toLowerCase().replace('www.', '');
