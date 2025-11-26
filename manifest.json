@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Medusa - Ask to AI v1.0.4",
-  "version": "1.0.4",
-  "description": "Medusa - Ask to AI: ChatGPT, Claude, DeepSeek, Copilot, Gemini, Grok, Meta, Mistral, Google, Perplexity or ALL AI",
+  "name": "Medusa - Ask to AI v1.0",
+  "version": "1.0",
+  "description": "Medusa - Ask to AI: ChatGPT, DeepSeek, Copilot, Gemini, etc... or ALL AI",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
