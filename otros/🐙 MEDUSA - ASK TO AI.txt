@@ -1,0 +1,82 @@
+🐙 MEDUSA - ASK TO AI
+
+The ultimate AI assistant extension that lets you query multiple AI platforms from a single, elegant interface.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ KEY FEATURES
+
+🤖 MULTI-AI SUPPORT
+Send your prompts to the most popular AI platforms:
+• ChatGPT (OpenAI)
+• Claude (Anthropic)
+• DeepSeek
+• Microsoft Copilot
+• Google Gemini
+• Grok (xAI)
+• Meta AI
+• Mistral AI
+• Perplexity
+• Google Search
+
+⚡ ALL AI MODE
+Ask all AIs the same question simultaneously! Compare responses and get the best answers from multiple sources at once.
+
+🖱️ RIGHT-CLICK INTEGRATION
+Select any text on a webpage, right-click, and instantly send it to your favorite AI with context.
+
+📝 SMART CONTEXT
+Add the current page URL or selected text as context to your prompts with a single checkbox.
+
+📊 PROMPT HISTORY
+Your most frequently used prompts are saved and displayed for quick reuse.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 HOW TO USE
+
+1. Click the Medusa icon in your toolbar
+2. Select your preferred AI (or choose "ALL AI")
+3. Type your question
+4. Optionally add context with the "+" checkbox
+5. Click ASK and watch the magic happen!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 USE CASES
+
+• Research: Compare answers from multiple AIs
+• Coding: Get code suggestions from different assistants
+• Writing: Find the best wording or translation
+• Learning: Explore topics from various perspectives
+• Productivity: Quick access to AI without switching tabs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔒 PRIVACY
+
+• No data collection
+• No tracking
+• Your prompts stay between you and the AI platforms
+• Open source and transparent
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆓 100% FREE
+
+Medusa is completely free to use. No subscriptions, no hidden fees, no limitations.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📧 SUPPORT
+
+Found a bug or have a suggestion? We'd love to hear from you!
+Use the Share button to spread the word or Rate us to show your support.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌟 Why "Medusa"?
+
+Like the mythical creature with many heads, Medusa connects you to multiple AI minds simultaneously, giving you the power to harness collective artificial intelligence.
+
+Download now and unleash the power of multiple AIs! 🐙

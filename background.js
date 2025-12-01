@@ -7,7 +7,7 @@
 function updateContextMenu(url) {
   if (url) {
     chrome.contextMenus.update('askToAIPage', {
-      title: `Ask To AI: ${url}`
+      title: `Medusa - Ask To AI: ${url}`
     });
   }
 }
@@ -32,14 +32,14 @@ chrome.runtime.onInstalled.addListener(() => {
   // Menú contextual en las páginas web cuando hay texto seleccionado
   chrome.contextMenus.create({
     id: 'askToAISelection',
-    title: 'Ask To AI: "%s"',
+    title: 'Medusa - Ask To AI: "%s"',
     contexts: ['selection']
   });
   
   // Menú contextual en las páginas web cuando NO hay texto seleccionado
   chrome.contextMenus.create({
     id: 'askToAIPage',
-    title: 'Ask To AI: (Current page URL)',
+    title: 'Medusa - Ask To AI: (Current page URL)',
     contexts: ['page']
   });
 });
