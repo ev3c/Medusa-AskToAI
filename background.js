@@ -69,7 +69,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'Share') {
     // Abrir email para compartir la extensión
     const subject = 'Medusa - Ask to AI';
-    const body = `Hi!
+    const body = `Hi!👋
 
 I found a Chrome extension that I think you'll find useful.
 

@@ -1,3 +1,88 @@
+// Función de notificación personalizada
+function showNotification(message, type = 'info') {
+    // Eliminar notificación existente si hay una
+    const existing = document.querySelector('.custom-notification');
+    if (existing) existing.remove();
+    
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.className = `custom-notification notification-${type}`;
+    notification.textContent = message;
+    
+    // Añadir al DOM
+    document.body.appendChild(notification);
+    
+    // Mostrar con animación
+    requestAnimationFrame(() => {
+        notification.classList.add('show');
+    });
+    
+    // Auto-ocultar después de 3 segundos
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Función de confirmación personalizada
+function showConfirm(message) {
+    return new Promise((resolve) => {
+        // Eliminar confirmación existente si hay una
+        const existing = document.querySelector('.custom-confirm-overlay');
+        if (existing) existing.remove();
+        
+        // Crear overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-confirm-overlay';
+        
+        // Crear diálogo
+        const dialog = document.createElement('div');
+        dialog.className = 'custom-confirm-dialog';
+        
+        // Mensaje
+        const messageEl = document.createElement('p');
+        messageEl.className = 'confirm-message';
+        messageEl.textContent = message;
+        
+        // Contenedor de botones
+        const buttons = document.createElement('div');
+        buttons.className = 'confirm-buttons';
+        
+        // Botón Cancelar
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'confirm-btn confirm-btn-cancel';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.onclick = () => {
+            overlay.classList.remove('show');
+            setTimeout(() => overlay.remove(), 200);
+            resolve(false);
+        };
+        
+        // Botón Confirmar
+        const confirmBtn = document.createElement('button');
+        confirmBtn.className = 'confirm-btn confirm-btn-confirm';
+        confirmBtn.textContent = 'Confirm';
+        confirmBtn.onclick = () => {
+            overlay.classList.remove('show');
+            setTimeout(() => overlay.remove(), 200);
+            resolve(true);
+        };
+        
+        // Ensamblar
+        buttons.appendChild(cancelBtn);
+        buttons.appendChild(confirmBtn);
+        dialog.appendChild(messageEl);
+        dialog.appendChild(buttons);
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        
+        // Mostrar con animación
+        requestAnimationFrame(() => {
+            overlay.classList.add('show');
+        });
+    });
+}
+
 // Cargar preferencia guardada
 async function loadUserPreference() {
     try {
@@ -92,15 +177,15 @@ async function displayFrequentPrompts() {
 
 // Borrar todo el historial de prompts
 async function clearPromptHistory() {
-    const confirmed = confirm('¿Estás seguro de que quieres borrar todo el historial de prompts?');
+    const confirmed = await showConfirm('Are you sure you want to delete all prompt history?');
     if (confirmed) {
         try {
             await chrome.storage.local.remove('promptHistory');
             await displayFrequentPrompts();
-            console.log('Historial de prompts borrado correctamente.');
+            showNotification('History cleared successfully.', 'success');
         } catch (error) {
-            console.error('Error al borrar el historial:', error);
-            alert('Error al borrar el historial. Por favor, intenta de nuevo.');
+            console.error('Error deleting history:', error);
+            showNotification('Error deleting history. Please try again.', 'error');
         }
     }
 }
@@ -137,16 +222,27 @@ async function updateContext() {
         const askInput = document.getElementById('askInput');
         
         // Prioridad 1: Datos del menú contextual
-        const contextData = await chrome.storage.local.get(['contextSelection', 'contextTimestamp']);
+        const contextData = await chrome.storage.local.get(['contextSelection', 'contextUrl', 'contextTimestamp']);
         if (contextData.contextTimestamp && (Date.now() - contextData.contextTimestamp) < 2000) {
-            chrome.storage.local.remove(['contextSelection', 'contextTimestamp']); // Limpiar
-            if (contextData.contextSelection) {
-                const selection = contextData.contextSelection.trim();
-                askInput.value = selection;
-                contextPreview.textContent = selection.substring(0, 200) + (selection.length > 200 ? '...' : '');
-                console.log('Contexto cargado desde menú contextual.');
-                return;
+            chrome.storage.local.remove(['contextSelection', 'contextUrl', 'contextTimestamp']); // Limpiar
+            
+            // Marcar automáticamente el checkbox addContext cuando viene del menú contextual
+            const addContextCheckbox = document.getElementById('addContext');
+            if (addContextCheckbox) {
+                addContextCheckbox.checked = true;
             }
+            
+            if (contextData.contextSelection) {
+                // Hay texto seleccionado
+                const selection = contextData.contextSelection.trim();
+                contextPreview.textContent = selection.substring(0, 200) + (selection.length > 200 ? '...' : '');
+                console.log('Contexto (texto seleccionado) cargado desde menú contextual.');
+            } else if (contextData.contextUrl) {
+                // Solo hay URL (sin texto seleccionado)
+                contextPreview.textContent = contextData.contextUrl;
+                console.log('Contexto (URL) cargado desde menú contextual.');
+            }
+            return;
         }
         
         // Prioridad 2: Texto seleccionado en la pestaña activa
@@ -227,24 +323,37 @@ https://chromewebstore.google.com/detail/fhmnjlphalkbleldbkomopkofcajinng?utm_so
 
 // Manejador del botón "ASK"
 async function handleAskButtonClick() {
-    const button = this;
+    const button = document.getElementById('yesButton');
     button.disabled = true;
 
     try {
         const selectedAI = getSelectedAI();
         if (!selectedAI) {
-            alert("Por favor, selecciona un servicio de IA.");
+            showNotification('Please select an AI service.', 'warning');
             return;
         }
 
-        const textPrompt = document.getElementById('askInput').value.trim();
+        let textPrompt = document.getElementById('askInput').value.trim();
         if (!textPrompt) {
-            alert("Por favor, escribe una pregunta.");
+            showNotification('Please write a question.', 'warning');
             return;
         }
 
-        // Guardar el prompt en el historial
-        await savePromptUsage(textPrompt);
+        // Si el checkbox addContext está marcado, añadir el contexto al prompt
+        const addContextCheckbox = document.getElementById('addContext');
+        if (addContextCheckbox && addContextCheckbox.checked) {
+            const contextPreview = document.getElementById('contextPreview');
+            const contextText = contextPreview?.textContent?.trim();
+            
+            if (contextText) {
+                // Añadir el contexto al final del prompt
+                textPrompt = `${textPrompt}\n\n--- Context ---\n${contextText}`;
+                console.log('Contexto añadido al prompt.');
+            }
+        }
+
+        // Guardar el prompt en el historial (sin el contexto para mantener limpio el historial)
+        await savePromptUsage(document.getElementById('askInput').value.trim());
 
         // Enviar la petición al script de fondo (background.js) para que la procese
         console.log(`Enviando petición a background para '${selectedAI}'...`);
@@ -259,8 +368,8 @@ async function handleAskButtonClick() {
         // window.close(); // Opcional: cerrar el popup automáticamente
 
     } catch (error) {
-        console.error('Error en el popup:', error);
-        alert('Se produjo un error: ' + error.message);
+        console.error('Error in popup:', error);
+        showNotification('An error occurred: ' + error.message, 'error');
     } finally {
         button.disabled = false;
     }

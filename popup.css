@@ -280,4 +280,124 @@ body {
 
 .frequent-prompts-container.hidden {
     display: none;
+}
+
+/* Custom notification styles */
+.custom-notification {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100%);
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.3s ease;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.notification-info {
+    background-color: #3498db;
+    color: white;
+}
+
+.notification-success {
+    background-color: #27ae60;
+    color: white;
+}
+
+.notification-warning {
+    background-color: #f39c12;
+    color: white;
+}
+
+.notification-error {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Custom confirm dialog styles */
+.custom-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.custom-confirm-overlay.show {
+    opacity: 1;
+}
+
+.custom-confirm-dialog {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 280px;
+    width: 90%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9);
+    transition: transform 0.2s ease;
+}
+
+.custom-confirm-overlay.show .custom-confirm-dialog {
+    transform: scale(1);
+}
+
+.confirm-message {
+    margin: 0 0 16px 0;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.confirm-btn {
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.confirm-btn-cancel {
+    background-color: #e0e0e0;
+    color: #555;
+}
+
+.confirm-btn-cancel:hover {
+    background-color: #d0d0d0;
+}
+
+.confirm-btn-confirm {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.confirm-btn-confirm:hover {
+    background-color: #c0392b;
 } 

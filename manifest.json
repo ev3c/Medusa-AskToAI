@@ -53,6 +53,7 @@
         "https://copilot.microsoft.com/*",
         "https://gemini.google.com/*",
         "https://x.ai/*",
+        "https://grok.com/*",
         "https://meta.ai/*",
         "https://chat.mistral.ai/*",
         "https://www.perplexity.ai/*"
