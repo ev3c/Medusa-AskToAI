@@ -66,15 +66,39 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 // Manejar clicks en el menú contextual
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === 'share') {
-    // Abrir página para compartir la extensión
+  if (info.menuItemId === 'Share') {
+    // Abrir email para compartir la extensión
+    const subject = 'Medusa - Ask to AI';
+    const body = `Hi!
+
+I found a Chrome extension that I think you'll find useful.
+
+It's called Medusa Ask to AI, and it lets you send prompts to ChatGPT, Claude, DeepSeek, Copilot, Gemini, Grok, Meta, Mistral, Google, and Perplexity.
+And also you can send the same prompt to all the AIs at once.
+
+🔗 You can install it for free here from the Google Chrome Store: 
+https://chromewebstore.google.com/detail/fhmnjlphalkbleldbkomopkofcajinng?utm_source=item-share-cb
+
+--- 
+
+¡Hola!👋 
+
+Encontré una extensión de Chrome que creo que te va a ser útil.
+
+Se llama Medusa Ask to AI y te permite enviar prompts a ChatGPT, Claude, DeepSeek, Copilot, Gemini, Grok, Meta, Mistral, Google y Perplexity.
+También puedes enviar un mismo prompt a todas las AI a la vez.
+
+🔗 La puedes instalar gratis aquí desde la Chrome Store de Google:
+https://chromewebstore.google.com/detail/fhmnjlphalkbleldbkomopkofcajinng?utm_source=item-share-cb`;
+    
+    const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     chrome.tabs.create({
-      url: 'https://github.com/yourusername/ask-to-ai'  // Cambia esto por tu URL
+      url: mailtoUrl
     });
-  } else if (info.menuItemId === 'rate') {
+  } else if (info.menuItemId === 'Rate') {
     // Abrir página de Chrome Web Store para calificar
     chrome.tabs.create({
-      url: 'https://chrome.google.com/webstore/detail/your-extension-id'  // Cambia esto por tu URL
+      url: 'https://chromewebstore.google.com/detail/fhmnjlphalkbleldbkomopkofcajinng?utm_source=item-share-cb'
     });
   } else if (info.menuItemId === 'askToAISelection') {
     // Guardar el texto seleccionado y la URL para usarlo en el popup

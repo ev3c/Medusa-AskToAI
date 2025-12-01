@@ -90,6 +90,21 @@ async function displayFrequentPrompts() {
     });
 }
 
+// Borrar todo el historial de prompts
+async function clearPromptHistory() {
+    const confirmed = confirm('¿Estás seguro de que quieres borrar todo el historial de prompts?');
+    if (confirmed) {
+        try {
+            await chrome.storage.local.remove('promptHistory');
+            await displayFrequentPrompts();
+            console.log('Historial de prompts borrado correctamente.');
+        } catch (error) {
+            console.error('Error al borrar el historial:', error);
+            alert('Error al borrar el historial. Por favor, intenta de nuevo.');
+        }
+    }
+}
+
 // Obtener servicio seleccionado
 function getSelectedAI() {
     const selectedRadio = document.querySelector('input[name="aiService"]:checked');
@@ -169,6 +184,44 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 
     document.getElementById('yesButton').addEventListener('click', handleAskButtonClick);
+    
+    // Event listener para borrar historial
+    document.getElementById('clearHistoryButton').addEventListener('click', clearPromptHistory);
+    
+    // Event listeners para los iconos del header
+    document.getElementById('shareIcon').addEventListener('click', () => {
+        const subject = 'Medusa - Ask to AI';
+        const body = `Hi!👋 
+
+I found a Chrome extension that I think you'll find useful.
+
+It's called Medusa Ask to AI, and it lets you send prompts to ChatGPT, Claude, DeepSeek, Copilot, Gemini, Grok, Meta, Mistral, Google, and Perplexity.
+And also you can send the same prompt to all the AIs at once.
+
+🔗 You can install it for free here from the Google Chrome Store: 
+https://chromewebstore.google.com/detail/fhmnjlphalkbleldbkomopkofcajinng?utm_source=item-share-cb
+
+--- 
+
+¡Hola!👋 
+
+Encontré una extensión de Chrome que creo que te va a ser útil.
+
+Se llama Medusa Ask to AI y te permite enviar prompts a ChatGPT, Claude, DeepSeek, Copilot, Gemini, Grok, Meta, Mistral, Google y Perplexity.
+También puedes enviar un mismo prompt a todas las AI a la vez.
+
+🔗 La puedes instalar gratis aquí desde la Chrome Store de Google:
+https://chromewebstore.google.com/detail/fhmnjlphalkbleldbkomopkofcajinng?utm_source=item-share-cb`;
+        
+        const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.open(mailtoUrl);
+    });
+    
+    document.getElementById('rateIcon').addEventListener('click', () => {
+        chrome.tabs.create({
+            url: 'https://chromewebstore.google.com/detail/fhmnjlphalkbleldbkomopkofcajinng?utm_source=item-share-cb'
+        });
+    });
 });
 
 
