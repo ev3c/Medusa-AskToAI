@@ -80,3 +80,93 @@ Use the Share button to spread the word or Rate us to show your support.
 Like the mythical creature with many heads, Medusa connects you to multiple AI minds simultaneously, giving you the power to harness collective artificial intelligence.
 
 Download now and unleash the power of multiple AIs! 🐙
+
+
+
+======================
+ESPAÑOL
+======================
+
+🐙 MEDUSA - ASK TO AI
+
+La extensión definitiva que te permite consultar múltiples plataformas de IA desde una única interfaz elegante.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ CARACTERÍSTICAS PRINCIPALES
+
+🤖 SOPORTE MULTI-IA
+Envía tus prompts a las plataformas de IA más populares:
+• ChatGPT (OpenAI)
+• Claude (Anthropic)
+• DeepSeek
+• Microsoft Copilot
+• Google Gemini
+• Grok (xAI)
+• Meta AI
+• Mistral AI
+• Perplexity
+• Google Search
+
+⚡ MODO ALL AI
+¡Pregunta a todas las IAs la misma pregunta simultáneamente! Compara respuestas y obtén las mejores respuestas de múltiples fuentes a la vez.
+
+🖱️ INTEGRACIÓN CON CLIC DERECHO
+Selecciona cualquier texto en una página web, haz clic derecho y envíalo instantáneamente a tu IA favorita con contexto.
+
+📝 CONTEXTO INTELIGENTE
+Añade la URL de la página actual o el texto seleccionado como contexto a tus prompts con un solo checkbox.
+
+📊 HISTORIAL DE PROMPTS
+Tus prompts más utilizados se guardan y se muestran para reutilizarlos rápidamente.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 CÓMO USAR
+
+1. Haz clic en el icono de Medusa en tu barra de herramientas
+2. Selecciona tu IA preferida (o elige "ALL AI")
+3. Escribe tu pregunta
+4. Opcionalmente añade contexto con el checkbox "+"
+5. ¡Haz clic en ASK y observa la magia!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 CASOS DE USO
+
+• Investigación: Compara respuestas de múltiples IAs
+• Programación: Obtén sugerencias de código de diferentes asistentes
+• Escritura: Encuentra la mejor redacción o traducción
+• Aprendizaje: Explora temas desde varias perspectivas
+• Productividad: Acceso rápido a IA sin cambiar de pestaña
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔒 PRIVACIDAD
+
+• Sin recopilación de datos
+• Sin seguimiento
+• Tus prompts quedan entre tú y las plataformas de IA
+• Código abierto y transparente
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆓 100% GRATIS
+
+Medusa es completamente gratis. Sin suscripciones, sin tarifas ocultas, sin limitaciones.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📧 SOPORTE
+
+¿Encontraste un error o tienes una sugerencia? ¡Nos encantaría saber de ti!
+Usa el botón Share para correr la voz o califícanos para mostrar tu apoyo.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌟 ¿Por qué "Medusa"?
+
+Como la criatura mitológica con muchas cabezas, Medusa te conecta con múltiples mentes de IA simultáneamente, dándote el poder de aprovechar la inteligencia artificial colectiva.
+
+¡Descarga ahora y libera el poder de múltiples IAs! 🐙
+
