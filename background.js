@@ -204,9 +204,17 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
     if (targetTab) {
       console.log(`✅ Pestaña existente encontrada para ${ai}:`, targetTab.id);
       tabToUse = targetTab;
-      // Solo activar, no recargar para preservar la conversación
+      // Activar y recargar la pestaña existente
       await chrome.tabs.update(tabToUse.id, { active: true });
-      console.log(`➡️ Pestaña ${ai} activada sin recargar.`);
+      console.log(`🔄 Recargando pestaña existente ${ai}...`);
+      await chrome.tabs.reload(tabToUse.id);
+      await waitForTabLoad(tabToUse.id);
+      console.log(`✅ Pestaña ${ai} recargada.`);
+      
+      // Delay de apertura para que la página esté lista
+      const openDelay = (aiConfig.segundosApertura || 1.5) * 1000;
+      console.log(`⏳ Esperando ${openDelay}ms después de recargar...`);
+      await new Promise(resolve => setTimeout(resolve, openDelay));
     } else {
       console.log(`❌ No se encontró pestaña para ${ai}, creando nueva.`);
       tabToUse = await chrome.tabs.create({ url: aiConfig.web, active: false });
