@@ -177,28 +177,37 @@ async function openAIWithPrompt(prompt, aiModel, submit = true) {
       return;
     }
 
-    const allTabs = await chrome.tabs.query({});
-
-    // Lógica mejorada para encontrar una pestaña existente
-    let targetTab = allTabs.find(tab => {
-    if (!tab.url) return false;
-    if (ai === 'google') return false; // Omitir la reutilización para Google
-      try {
-        const tabHostname = new URL(tab.url).hostname.toLowerCase();
-
-        if (ai === 'meta') return tabHostname.includes('meta.ai');
-        
-        const web1Hostname = new URL(aiConfig.web).hostname.toLowerCase().replace('www.', '');
-        let matches = tabHostname.includes(web1Hostname);
-        if (aiConfig.web2) {
-          const web2Hostname = new URL(aiConfig.web2).hostname.toLowerCase().replace('www.', '');
-          matches = matches || tabHostname.includes(web2Hostname);
-        }
-        return matches;
-      } catch (e) {
-        return false; // URL inválida en la pestaña
+    // Verificar si tiene permiso 'tabs' para reutilizar pestañas
+    let targetTab = null;
+    try {
+      const hasTabsPermission = await chrome.permissions.contains({ permissions: ['tabs'] });
+      
+      if (hasTabsPermission) {
+        const allTabs = await chrome.tabs.query({});
+        targetTab = allTabs.find(tab => {
+          if (!tab.url) return false;
+          if (ai === 'google') return false; // Omitir la reutilización para Google
+          try {
+            const tabHostname = new URL(tab.url).hostname.toLowerCase();
+            if (ai === 'meta') return tabHostname.includes('meta.ai');
+            
+            const web1Hostname = new URL(aiConfig.web).hostname.toLowerCase().replace('www.', '');
+            let matches = tabHostname.includes(web1Hostname);
+            if (aiConfig.web2) {
+              const web2Hostname = new URL(aiConfig.web2).hostname.toLowerCase().replace('www.', '');
+              matches = matches || tabHostname.includes(web2Hostname);
+            }
+            return matches;
+          } catch (e) {
+            return false;
+          }
+        });
+      } else {
+        console.log('ℹ️ Permiso tabs no disponible, se abrirá nueva pestaña.');
       }
-    });
+    } catch (e) {
+      console.log('ℹ️ Error verificando permiso tabs:', e.message);
+    }
 
     let tabToUse;
     if (targetTab) {

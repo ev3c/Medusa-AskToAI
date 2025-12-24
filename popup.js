@@ -321,6 +321,20 @@ https://chromewebstore.google.com/detail/fhmnjlphalkbleldbkomopkofcajinng?utm_so
 });
 
 
+// Solicitar permiso tabs para reutilizar pestañas (solo se pide una vez)
+async function requestTabsPermission() {
+    try {
+        const hasPermission = await chrome.permissions.contains({ permissions: ['tabs'] });
+        if (!hasPermission) {
+            // Solicitar el permiso al usuario
+            const granted = await chrome.permissions.request({ permissions: ['tabs'] });
+            console.log(granted ? '✅ Permiso tabs concedido.' : 'ℹ️ Permiso tabs denegado.');
+        }
+    } catch (e) {
+        console.log('ℹ️ No se pudo solicitar permiso tabs:', e.message);
+    }
+}
+
 // Manejador del botón "ASK"
 async function handleAskButtonClick() {
     const button = document.getElementById('yesButton');
@@ -338,6 +352,9 @@ async function handleAskButtonClick() {
             showNotification('Please write a question.', 'warning');
             return;
         }
+
+        // Solicitar permiso tabs (solo la primera vez, para reutilizar pestañas)
+        await requestTabsPermission();
 
         // Si el checkbox addContext está marcado, añadir el contexto al prompt
         const addContextCheckbox = document.getElementById('addContext');
